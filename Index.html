@@ -1,0 +1,35 @@
+function saveData() {
+      let payload = {
+        date: document.getElementById('testDate').value,
+        docNo: document.getElementById('docNo').value,
+        jobType: document.getElementById('jobType').value,
+        sampleType: document.getElementById('sampleType').value,
+        status: document.getElementById('ironStatus').value,
+        details: collectChemData() // ดึงข้อมูลจากตาราง (รองรับทั้งเหล็กและบรอนซ์ที่เราทำไว้)
+      };
+
+      // ล็อคปุ่มกันกดซ้ำ (ถ้ามีปุ่ม id="btnSave")
+      let btnSave = document.getElementById('btnSave');
+      if (btnSave) {
+        btnSave.disabled = true;
+        btnSave.innerText = "กำลังบันทึก...";
+      }
+
+      google.script.run
+        .withSuccessHandler(function(res) {
+          alert(res.message || "บันทึกข้อมูลเรียบร้อยแล้ว");
+          if (btnSave) {
+            btnSave.disabled = false;
+            btnSave.innerText = "บันทึกข้อมูล";
+          }
+          // location.reload(); // เปิดใช้บรรทัดนี้ได้หากต้องการให้รีเฟรชหน้าหลังบันทึก
+        })
+        .withFailureHandler(function(err) {
+          alert("เกิดข้อผิดพลาด: " + err.message);
+          if (btnSave) {
+            btnSave.disabled = false;
+            btnSave.innerText = "บันทึกข้อมูล";
+          }
+        })
+        .saveChemicalDataMultiple(payload);
+    }
